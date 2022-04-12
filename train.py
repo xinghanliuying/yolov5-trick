@@ -362,7 +362,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                                            save_dir=save_dir,
                                            plots=False,
                                            callbacks=callbacks,
-                                           compute_loss=compute_loss)
+                                           compute_loss=compute_loss,
+                                           half=not opt.swin_float)
 
             # Update best mAP
             fi = fitness(np.array(results).reshape(1, -1))  # weighted combination of [P, R, mAP@.5, mAP@.5-.95]
@@ -426,7 +427,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                                             verbose=True,
                                             plots=True,
                                             callbacks=callbacks,
-                                            compute_loss=compute_loss)  # val best model with plots
+                                            compute_loss=compute_loss,
+                                            half=not opt.swin_float)  # val best model with plots
                     if is_coco:
                         callbacks.run('on_fit_epoch_end', list(mloss) + list(results) + lr, epoch, best_fitness, fi)
 
@@ -478,7 +480,7 @@ def parse_opt(known=False):
     parser.add_argument('--upload_dataset', action='store_true', help='W&B: Upload dataset as artifact table')
     parser.add_argument('--bbox_interval', type=int, default=-1, help='W&B: Set bounding-box image logging interval')
     parser.add_argument('--artifact_alias', type=str, default='latest', help='W&B: Version of dataset artifact to use')
-
+    parser.add_argument('--swin_float', action='store_true', help='swin not use half to train/Val')
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
